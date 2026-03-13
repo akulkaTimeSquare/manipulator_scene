@@ -15,7 +15,7 @@ CAMERA_MAP = {
 }
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args():
     parser = argparse.ArgumentParser(description="Run MuJoCo mini sorting scene viewer.")
     parser.add_argument(
         "--camera",
@@ -32,7 +32,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def camera_id(model: mujoco.MjModel, camera_key: str) -> int:
+def camera_id(model, camera_key):
     cam_name = CAMERA_MAP[camera_key]
     cam_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, cam_name)
     if cam_id < 0:
@@ -40,12 +40,12 @@ def camera_id(model: mujoco.MjModel, camera_key: str) -> int:
     return cam_id
 
 
-def set_fixed_camera(cam: mujoco.MjvCamera, cam_id: int) -> None:
+def set_fixed_camera(cam, cam_id):
     cam.type = mujoco.mjtCamera.mjCAMERA_FIXED
     cam.fixedcamid = cam_id
 
 
-def set_free_overview_camera(cam: mujoco.MjvCamera) -> None:
+def set_free_overview_camera(cam):
     cam.type = mujoco.mjtCamera.mjCAMERA_FREE
     cam.lookat[:] = np.array([0.18, 0.0, 0.9])
     cam.distance = 1.45
@@ -53,7 +53,7 @@ def set_free_overview_camera(cam: mujoco.MjvCamera) -> None:
     cam.elevation = -30.0
 
 
-def set_joint_qpos(model: mujoco.MjModel, data: mujoco.MjData, joint_name: str, value: float) -> None:
+def set_joint_qpos(model, data, joint_name, value):
     joint_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, joint_name)
     if joint_id < 0:
         return
@@ -61,7 +61,7 @@ def set_joint_qpos(model: mujoco.MjModel, data: mujoco.MjData, joint_name: str, 
     data.qpos[qpos_adr] = value
 
 
-def set_initial_robot_pose(model: mujoco.MjModel, data: mujoco.MjData) -> None:
+def set_initial_robot_pose(model, data):
     # Keep the arm folded above the basket side to avoid cabinet contact at startup.
     set_joint_qpos(model, data, "j1", -2.2)
     set_joint_qpos(model, data, "j2", 0.45)
@@ -74,7 +74,7 @@ def set_initial_robot_pose(model: mujoco.MjModel, data: mujoco.MjData) -> None:
 
 
 
-def apply_hold_control(model: mujoco.MjModel, data: mujoco.MjData) -> None:
+def apply_hold_control(model, data):
     # Hold joints near the initialized pose to avoid self-collision drift.
     qref = {
         "j1": -2.2,
@@ -103,7 +103,9 @@ def apply_hold_control(model: mujoco.MjModel, data: mujoco.MjData) -> None:
     if model.nu >= 7:
         data.ctrl[5] = -0.30
         data.ctrl[6] = -0.30
-def main() -> None:
+
+
+def main():
     args = parse_args()
 
     if not SCENE_PATH.exists():
@@ -170,7 +172,7 @@ def main() -> None:
         "last_y": 0.0,
     }
 
-    def key_callback(_window, key, _scancode, action, _mods) -> None:
+    def key_callback(_window, key, _scancode, action, _mods):
         nonlocal main_key, inset_key, main_mode
 
         if action != glfw.PRESS:
@@ -199,7 +201,7 @@ def main() -> None:
             set_free_overview_camera(main_cam)
             print("Main free camera reset")
 
-    def mouse_button_callback(_window, button, action, _mods) -> None:
+    def mouse_button_callback(_window, button, action, _mods):
         mouse_state["left"] = glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS
         mouse_state["middle"] = glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_MIDDLE) == glfw.PRESS
         mouse_state["right"] = glfw.get_mouse_button(window, glfw.MOUSE_BUTTON_RIGHT) == glfw.PRESS
@@ -207,7 +209,7 @@ def main() -> None:
         mouse_state["last_x"] = x
         mouse_state["last_y"] = y
 
-    def cursor_pos_callback(_window, xpos, ypos) -> None:
+    def cursor_pos_callback(_window, xpos, ypos):
         if main_mode != "free":
             mouse_state["last_x"] = xpos
             mouse_state["last_y"] = ypos
@@ -239,7 +241,7 @@ def main() -> None:
 
         mujoco.mjv_moveCamera(model, action, dx / viewport_height, dy / viewport_height, scn, main_cam)
 
-    def scroll_callback(_window, _xoffset, yoffset) -> None:
+    def scroll_callback(_window, _xoffset, yoffset):
         if main_mode != "free":
             return
         mujoco.mjv_moveCamera(model, mujoco.mjtMouse.mjMOUSE_ZOOM, 0.0, -0.08 * yoffset, scn, main_cam)

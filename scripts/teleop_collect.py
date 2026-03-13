@@ -394,7 +394,7 @@ def main():
         mouse_state["last_x"] = x
         mouse_state["last_y"] = y
 
-    def cursor_pos_callback(_window, xpos, ypos) -> None:
+    def cursor_pos_callback(_window, xpos, ypos):
         if main_mode != "free":
             mouse_state["last_x"] = xpos
             mouse_state["last_y"] = ypos
@@ -425,7 +425,7 @@ def main():
 
         mujoco.mjv_moveCamera(model, action, dx / viewport_height, dy / viewport_height, scn, main_cam)
 
-    def scroll_callback(_window, _xoffset, yoffset) -> None:
+    def scroll_callback(_window, _xoffset, yoffset):
         if main_mode != "free":
             return
         mujoco.mjv_moveCamera(model, mujoco.mjtMouse.mjMOUSE_ZOOM, 0.0, -0.08 * yoffset, scn, main_cam)

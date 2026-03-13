@@ -1,0 +1,202 @@
+﻿<mujoco model="mini_sorting_scene">
+  <compiler angle="degree" autolimits="true"/>
+  <option gravity="0 0 -9.81" integrator="RK4" timestep="0.002"/>
+
+  <visual>
+    <headlight ambient="0.35 0.35 0.35" diffuse="0.7 0.7 0.7" specular="0.15 0.15 0.15"/>
+    <rgba haze="0.95 0.97 1.0 1"/>
+  </visual>
+
+  <asset>
+    <texture name="sky_bg" type="skybox" builtin="gradient" width="512" height="512"
+             rgb1="0.86 0.92 0.98" rgb2="0.98 0.99 1.0"/>
+    <material name="mat_ground" rgba="0.90 0.91 0.92 1" reflectance="0.02"/>
+
+    <material name="mat_table" rgba="0.72 0.58 0.42 1"/>
+    <material name="mat_robot" rgba="0.25 0.3 0.35 1"/>
+    <material name="mat_gripper" rgba="0.18 0.18 0.2 1"/>
+    <material name="mat_camera" rgba="0.08 0.08 0.09 1"/>
+    <material name="mat_lens" rgba="0.12 0.24 0.32 1"/>
+    <material name="mat_basket" rgba="0.3 0.2 0.12 1"/>
+    <material name="mat_cabinet" rgba="0.22 0.22 0.24 1"/>
+
+    <material name="shelf_red" rgba="0.9 0.25 0.25 1"/>
+    <material name="shelf_green" rgba="0.25 0.75 0.35 1"/>
+    <material name="shelf_blue" rgba="0.22 0.45 0.9 1"/>
+    <material name="shelf_yellow" rgba="0.95 0.83 0.25 1"/>
+    <material name="shelf_orange" rgba="0.94 0.5 0.2 1"/>
+    <material name="shelf_purple" rgba="0.62 0.36 0.86 1"/>
+
+    <material name="cube_red" rgba="0.92 0.2 0.2 1"/>
+    <material name="cube_green" rgba="0.22 0.82 0.3 1"/>
+    <material name="cube_blue" rgba="0.18 0.45 0.95 1"/>
+    <material name="cube_yellow" rgba="0.96 0.86 0.28 1"/>
+    <material name="cube_orange" rgba="0.95 0.5 0.15 1"/>
+  </asset>
+
+  <default>
+    <joint damping="2.2" armature="0.02"/>
+    <geom condim="4" friction="0.9 0.05 0.01" solref="0.01 1" solimp="0.9 0.97 0.001"/>
+    <motor ctrllimited="true" ctrlrange="-1 1"/>
+  </default>
+
+  <worldbody>
+    <light name="key_light" pos="0.2 -0.1 2.2" dir="0 0 -1" directional="true" castshadow="true"/>
+
+    <geom name="floor" type="plane" size="4 4 0.1" material="mat_ground"/>
+
+    <body name="table" pos="0 0 0">
+      <geom name="table_top" type="box" pos="0 0 0.76" size="0.52 0.40 0.02" material="mat_table"/>
+      <geom type="box" pos="0.46 0.34 0.38" size="0.03 0.03 0.38" material="mat_table"/>
+      <geom type="box" pos="0.46 -0.34 0.38" size="0.03 0.03 0.38" material="mat_table"/>
+      <geom type="box" pos="-0.46 0.34 0.38" size="0.03 0.03 0.38" material="mat_table"/>
+      <geom type="box" pos="-0.46 -0.34 0.38" size="0.03 0.03 0.38" material="mat_table"/>
+
+      <body name="robot_base" pos="-0.28 0.0 0.78">
+        <geom type="cylinder" size="0.055 0.03" material="mat_robot"/>
+
+        <body name="shoulder_yaw" pos="0 0 0.03">
+          <joint name="j1" type="hinge" axis="0 0 1" range="-180 180"/>
+          <geom type="capsule" fromto="0 0 0 0 0 0.17" size="0.035" material="mat_robot"/>
+
+          <body name="shoulder_pitch" pos="0 0 0.17">
+            <joint name="j2" type="hinge" axis="0 1 0" range="-135 135"/>
+            <geom type="capsule" fromto="0 0 0 0.24 0 0" size="0.028" material="mat_robot"/>
+
+            <body name="elbow_pitch" pos="0.24 0 0">
+              <joint name="j3" type="hinge" axis="0 1 0" range="-145 145"/>
+              <geom type="capsule" fromto="0 0 0 0.21 0 0" size="0.023" material="mat_robot"/>
+
+              <body name="wrist_pitch" pos="0.21 0 0">
+                <joint name="j4" type="hinge" axis="0 1 0" range="-160 160"/>
+                <geom type="capsule" fromto="0 0 0 0.08 0 0" size="0.02" material="mat_robot"/>
+
+                <body name="wrist_roll" pos="0.08 0 0">
+                  <joint name="j5" type="hinge" axis="1 0 0" range="-180 180"/>
+                  <geom type="sphere" size="0.03" material="mat_robot"/>
+                  <geom type="capsule" fromto="0 0 0 0 0.06 0" size="0.004" material="shelf_orange"/>
+
+                  <body name="ee" pos="0.04 0 0">
+                    <geom type="box" size="0.026 0.02 0.016" material="mat_gripper"/>
+                    <geom type="box" pos="0.014 0.013 0" size="0.012 0.0035 0.014" material="mat_gripper"/>
+                    <geom type="box" pos="0.014 -0.013 0" size="0.012 0.0035 0.014" material="mat_gripper"/>
+                    <geom type="box" pos="0.018 0.016 0" size="0.006 0.002 0.011" material="mat_gripper"/>
+                    <geom type="box" pos="0.018 -0.016 0" size="0.006 0.002 0.011" material="mat_gripper"/>
+                    <geom type="box" pos="0.01 0 0.025" size="0.0028 0.0028 0.011" material="mat_camera"/>
+                    <body name="grip_cam_mount" pos="0.012 0 0.038">
+                      <geom type="box" pos="-0.002 0 0" size="0.004 0.006 0.005" material="mat_camera"/>
+                      <geom type="box" pos="0.006 0 0.010" size="0.008 0.011 0.006" euler="0 24 0" material="mat_camera"/>
+                      <geom type="capsule" fromto="0.003 0 0.010 -0.006 0 0.014" size="0.0022" material="mat_lens"/>
+                      <camera name="grip_cam" pos="0.002 0 0.010" zaxis="-1 0 0.42" fovy="72"/>
+                    </body>
+
+                    <body name="left_finger" pos="0.035 0.018 0">
+                      <joint name="finger_left" type="hinge" axis="0 0 -1" range="-45 30" damping="0.35"/>
+                      <geom type="box" pos="0.024 0 0" size="0.022 0.0038 0.014" material="mat_gripper"/>
+                    </body>
+
+                    <body name="right_finger" pos="0.035 -0.018 0">
+                      <joint name="finger_right" type="hinge" axis="0 0 1" range="-45 30" damping="0.35"/>
+                      <geom type="box" pos="0.024 0 0" size="0.022 0.0038 0.014" material="mat_gripper"/>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+
+      <body name="basket" pos="-0.34 -0.27 0.78">
+        <geom type="box" pos="0 0 0.01" size="0.11 0.09 0.01" material="mat_basket"/>
+        <geom type="box" pos="0.11 0 0.04" size="0.01 0.09 0.04" material="mat_basket"/>
+        <geom type="box" pos="-0.11 0 0.04" size="0.01 0.09 0.04" material="mat_basket"/>
+        <geom type="box" pos="0 0.09 0.04" size="0.11 0.01 0.04" material="mat_basket"/>
+        <geom type="box" pos="0 -0.09 0.04" size="0.11 0.01 0.04" material="mat_basket"/>
+      </body>
+
+      <body name="cabinet" pos="0.22 0.0 0.78">
+        <geom type="box" pos="0 0.132 0.29" size="0.12 0.008 0.29" material="mat_cabinet"/>
+        <geom type="box" pos="0 -0.132 0.29" size="0.12 0.008 0.29" material="mat_cabinet"/>
+        <geom type="box" pos="0.112 0 0.29" size="0.008 0.132 0.29" material="mat_cabinet"/>
+        <geom type="box" pos="0 0 0.585" size="0.12 0.132 0.008" material="mat_cabinet"/>
+        <geom type="box" pos="0 0 0.08" size="0.106 0.124 0.006" material="shelf_red"/>
+        <geom type="box" pos="0 0 0.18" size="0.106 0.124 0.006" material="shelf_green"/>
+        <geom type="box" pos="0 0 0.28" size="0.106 0.124 0.006" material="shelf_blue"/>
+        <geom type="box" pos="0 0 0.38" size="0.106 0.124 0.006" material="shelf_yellow"/>
+        <geom type="box" pos="0 0 0.48" size="0.106 0.124 0.006" material="shelf_orange"/>
+        <geom type="box" pos="0.104 0 0.13" size="0.0025 0.122 0.044" material="shelf_red"/>
+        <geom type="box" pos="0.104 0 0.23" size="0.0025 0.122 0.044" material="shelf_green"/>
+        <geom type="box" pos="0.104 0 0.33" size="0.0025 0.122 0.044" material="shelf_blue"/>
+        <geom type="box" pos="0.104 0 0.43" size="0.0025 0.122 0.044" material="shelf_yellow"/>
+        <geom type="box" pos="0.104 0 0.53" size="0.0025 0.122 0.044" material="shelf_orange"/>
+      </body>
+    </body>
+
+    <body name="cube_red_1" pos="-0.31 -0.23 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_red"/>
+    </body>
+    <body name="cube_red_2" pos="-0.25 -0.24 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_red"/>
+    </body>
+    <body name="cube_green_1" pos="-0.29 -0.27 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_green"/>
+    </body>
+    <body name="cube_green_2" pos="-0.24 -0.2 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_green"/>
+    </body>
+    <body name="cube_blue_1" pos="-0.33 -0.2 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_blue"/>
+    </body>
+    <body name="cube_blue_2" pos="-0.27 -0.21 0.835">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_blue"/>
+    </body>
+    <body name="cube_yellow_1" pos="-0.31 -0.26 0.875">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_yellow"/>
+    </body>
+    <body name="cube_orange_1" pos="-0.25 -0.27 0.875">
+      <freejoint/>
+      <geom type="box" size="0.018 0.018 0.018" material="cube_orange"/>
+    </body>
+
+    <camera name="top_cam" pos="0.18 0 1.95" zaxis="-0.04 0 1" fovy="55"/>
+  </worldbody>
+
+  <actuator>
+    <motor name="a_j1" joint="j1" gear="65"/>
+    <motor name="a_j2" joint="j2" gear="75"/>
+    <motor name="a_j3" joint="j3" gear="70"/>
+    <motor name="a_j4" joint="j4" gear="50"/>
+    <motor name="a_j5" joint="j5" gear="35"/>
+    <position name="a_fl" joint="finger_left" kp="360" ctrlrange="-0.79 0.52" ctrllimited="true"/>
+    <position name="a_fr" joint="finger_right" kp="360" ctrlrange="-0.79 0.52" ctrllimited="true"/>
+  </actuator>
+</mujoco>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
